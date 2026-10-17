@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "__TITLE__",
+  "version": "0.1.0",
+  "description": "__DESCRIPTION__",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "__TITLE__"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+  "permissions": ["storage"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "__NAME__@tinwright",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": { "required": ["none"] },
+      "update_url": "https://tinwright.github.io/browser-trinkets/extensions/__NAME__/updates.json"
+    }
+  }
+}

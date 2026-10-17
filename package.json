@@ -1,0 +1,24 @@
+{
+  "name": "browser-trinkets",
+  "private": true,
+  "type": "module",
+  "description": "Extensions for Chrome and Firefox, with a catalog site.",
+  "license": "MIT",
+  "scripts": {
+    "create": "node scripts/create.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test \"scripts/*.test.mjs\" \"extensions/*/*.test.mjs\"",
+    "build": "node scripts/build-site.mjs",
+    "dev": "npm run build && node scripts/serve.mjs dist",
+    "package": "node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "marked": "18.1.0",
+    "playwright": "1.64.0",
+    "selenium-webdriver": "4.51.0",
+    "web-ext": "10.7.0"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

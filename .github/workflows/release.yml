@@ -1,0 +1,61 @@
+name: Release
+
+# A tag <extension>@<version> (example@0.2.0), matching that extension's manifest version, builds its
+# Chrome zip, has Mozilla sign its Firefox copy, and attaches both to a GitHub release.
+on:
+  push:
+    tags: ['*@*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Read the tag
+        id: tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          name=${TAG%@*}
+          version=${TAG##*@}
+          test -f "extensions/$name/manifest.json" || { echo "::error::No extension called $name"; exit 1; }
+          manifest=$(node -p "require('./extensions/$name/manifest.json').version")
+          test "$manifest" = "$version" || { echo "::error::The tag says $version, the manifest $manifest"; exit 1; }
+          firefox=$(node -p "((f) => { try { return require(f).browsers ?? ['chrome','firefox'] } catch { return ['chrome','firefox'] } })('./extensions/$name/item.json').includes('firefox')")
+          echo "name=$name" >>"$GITHUB_OUTPUT"
+          echo "version=$version" >>"$GITHUB_OUTPUT"
+          echo "firefox=$firefox" >>"$GITHUB_OUTPUT"
+      - name: Build the Chrome zip
+        env:
+          NAME: ${{ steps.tag.outputs.name }}
+        run: npm run package -- "$NAME" --out out
+      - name: Sign the Firefox copy
+        if: steps.tag.outputs.firefox == 'true'
+        env:
+          NAME: ${{ steps.tag.outputs.name }}
+          VERSION: ${{ steps.tag.outputs.version }}
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npx web-ext sign --source-dir "extensions/$NAME" --artifacts-dir signed --channel unlisted \
+            --ignore-files '*.test.mjs' 'README*.md' item.json screenshot.png
+          mv signed/*.xpi "out/$NAME-$VERSION-firefox.xpi"
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          NAME: ${{ steps.tag.outputs.name }}
+        run: |
+          node scripts/changelog.mjs "$NAME" >notes.md
+          gh release create "$TAG" out/* --title "$TAG" --notes-file notes.md

@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Example",
+  "version": "0.1.0",
+  "description": "A note that waits in your toolbar: write anything, and it's still there next time.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Example"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+  "permissions": ["storage"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "example@tinwright",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": { "required": ["none"] },
+      "update_url": "https://tinwright.github.io/browser-trinkets/extensions/example/updates.json"
+    }
+  }
+}
