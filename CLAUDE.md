@@ -69,7 +69,7 @@ when a test needs more, in both halves. `BROWSERS=chrome npm test` runs just one
 
 ```sh
 npm run check   # manifest rules, web-ext lint, READMEs, tests, template leftovers, secrets
-npm test        # the site, and every extension in both browsers
+npm test        # every extension in both browsers
 ```
 
 CI runs both, and the private-data guard, which fails on company hosts, internal IDs and work
@@ -90,7 +90,9 @@ For the stores later: the Chrome Web Store takes the same zip. A public addons.m
 
 ### Site
 
-`npm run build` writes the catalog site to `dist/`; `npm run dev` serves it at
-http://localhost:3000. The install buttons and facts come from `scripts/page.js`'s extension points,
-fed by each manifest (version, permissions) and `item.json` (browsers). The build also writes
-`items.json`, which the org-wide gallery at https://tinwright.github.io reads.
+The catalog site at https://tinwright.github.io/browser-trinkets is built by `tinwright.github.io` from a
+checkout of this repo, hourly and on demand; nothing here builds or deploys it. The install
+buttons and facts come from `scripts/site.mjs`, fed by each manifest (version, permissions) and
+`item.json` (browsers), and `scripts/rules.mjs` `afterBuild` writes each `updates.json`. To see it,
+run `npm run dev` in `tinwright.github.io`, cloned next to this repo; its `npm test` checks every
+page and link.

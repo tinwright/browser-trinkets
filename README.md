@@ -25,8 +25,7 @@ npm install
 npx playwright install chromium   # once, for the Chrome tests
 npm run create -- my-extension --description "What it does, in one sentence."
 npm run check   # this workshop's rules, web-ext lint, and a scan for secrets
-npm test        # the site, and every extension in real Chrome and Firefox
-npm run dev     # the catalog site at http://localhost:3000
+npm test        # every extension in real Chrome and Firefox
 ```
 
 [`CLAUDE.md`](CLAUDE.md) is the full guide, written so Claude can follow it too.
